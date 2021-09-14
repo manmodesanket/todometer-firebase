@@ -1,10 +1,17 @@
 import Head from "next/head";
 import { useEffect, useState } from "react";
-import { AddItemForm, DateView, Meter, Navbar, TodoView } from "../components";
+import {
+  AddItemForm,
+  AuthForm,
+  DateView,
+  Meter,
+  Navbar,
+  TodoView,
+} from "../components";
 import { useAppContext } from "../context/AppContext";
 
 export default function Home() {
-  const { darkMode } = useAppContext();
+  const { darkMode, user } = useAppContext();
   let [dark, setDark] = useState("light");
   useEffect(() => {
     setDark(darkMode);
@@ -19,10 +26,16 @@ export default function Home() {
 
         <main className="w-11/12 sm:w-9/12 min-h-screen mx-auto sm:px-80">
           <Navbar />
-          <DateView />
-          <Meter />
-          <AddItemForm />
-          <TodoView />
+          {user ? (
+            <>
+              <DateView />
+              <Meter />
+              <AddItemForm />
+              <TodoView />
+            </>
+          ) : (
+            <AuthForm />
+          )}
         </main>
       </div>
     </div>

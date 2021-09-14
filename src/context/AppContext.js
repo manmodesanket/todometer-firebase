@@ -5,8 +5,26 @@ import {
   useReducer,
   useState,
 } from "react";
+import { initializeApp } from "@firebase/app";
+import { getFirestore } from "@firebase/firestore";
+import { getAuth } from "@firebase/auth";
+import "firebase/firestore";
+import "firebase/auth";
 import useLocalStorage from "../hooks/useLocalStorage";
 import { todoReducer } from "../reducer/TodoReducer";
+
+const firebaseConfig = {
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_ID,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_API_ID,
+};
+
+const firebase = initializeApp(firebaseConfig);
+const db = getFirestore(firebase);
+const auth = getAuth(firebase);
 
 const AppContext = createContext();
 
@@ -20,9 +38,23 @@ export default function AppContextProvider({ children }) {
   const [pending, setPending] = useState([]);
   const [paused, setPaused] = useState([]);
   const [completed, setCompleted] = useState([]);
-
+  const [user, setUser] = useState(null);
+  const [loadingAuth, setLoadingAuth] = useState(true);
   const [storedDarkMode, setStoredDarkMode] = useLocalStorage("dark", "light");
   const [darkMode, setDarkMode] = useState(storedDarkMode);
+
+  useEffect(() => {
+    const listener = auth.onAuthStateChanged((user) => {
+      if (user != null) {
+        setUser(user);
+        setLoadingAuth(false);
+      } else {
+        setUser(null);
+        setLoadingAuth(false);
+      }
+    });
+    return () => listener();
+  }, []);
 
   useEffect(() => {
     setDarkMode(storedDarkMode);
@@ -52,6 +84,11 @@ export default function AppContextProvider({ children }) {
     <AppContext.Provider
       value={{
         toggleTheme,
+        firebase,
+        db,
+        loadingAuth,
+        auth,
+        user,
         darkMode,
         pending,
         paused,
