@@ -1,17 +1,35 @@
+import { getAuth } from "@firebase/auth";
 import Image from "next/image";
 import { useAppContext } from "../../context/AppContext";
 import { addToComplete, addToPending, removeTodo } from "../../utils/utils";
 
 function DoLaterTodoCard({ todoItem }) {
-  const { todoDispatch } = useAppContext();
+  const { todoDispatch, db } = useAppContext();
+  const auth = getAuth();
+  const { displayName } = auth.currentUser;
 
-  function handleAction(action) {
+  async function handleAction(action) {
     if (action === "REMOVE") {
-      removeTodo({ id: todoItem.id, dispatch: todoDispatch });
+      await removeTodo({
+        id: todoItem.id,
+        dispatch: todoDispatch,
+        username: displayName,
+        db,
+      });
     } else if (action === "PENDING") {
-      addToPending({ todo: todoItem, dispatch: todoDispatch });
+      await addToPending({
+        todo: todoItem,
+        dispatch: todoDispatch,
+        username: displayName,
+        db,
+      });
     } else if (action === "COMPLETED") {
-      addToComplete({ todo: todoItem, dispatch: todoDispatch });
+      await addToComplete({
+        todo: todoItem,
+        dispatch: todoDispatch,
+        username: displayName,
+        db,
+      });
     }
   }
 

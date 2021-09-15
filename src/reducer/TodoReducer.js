@@ -8,6 +8,9 @@ export function todoReducer(state, action) {
       const newState = [...state, action.payload];
       return newState;
 
+    case "ADD_ALL_ITEMS":
+      return action.payload;
+
     case "REMOVE_ITEM":
       newTodoList = state.filter((todo) => todo.id != action.payload);
       return newTodoList;

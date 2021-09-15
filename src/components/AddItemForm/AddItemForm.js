@@ -21,7 +21,6 @@ export default function AddItemForm() {
         time: Date.now(),
         status: "pending",
       };
-      console.log(newTodo);
       setDoc(doc(db, user.displayName, newTodo.id), newTodo).then(() => {
         todoDispatch({
           type: "ADD_ITEM",

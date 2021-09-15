@@ -6,9 +6,9 @@ import {
   useState,
 } from "react";
 import { initializeApp } from "@firebase/app";
-import { getFirestore } from "@firebase/firestore";
+import { getDoc, getFirestore } from "@firebase/firestore";
 import { getAuth } from "@firebase/auth";
-import "firebase/firestore";
+import { getDocs, collection } from "firebase/firestore";
 import "firebase/auth";
 import useLocalStorage from "../hooks/useLocalStorage";
 import { todoReducer } from "../reducer/TodoReducer";
@@ -54,6 +54,20 @@ export default function AppContextProvider({ children }) {
     return () => listener();
   }, []);
 
+  useEffect(async () => {
+    let firebaseTodos = [];
+    if (user !== null) {
+      const snap = await getDocs(collection(db, auth.currentUser.displayName));
+      snap.forEach((doc) => {
+        firebaseTodos.push(doc.data());
+      });
+    }
+    todoDispatch({
+      type: "ADD_ALL_ITEMS",
+      payload: firebaseTodos,
+    });
+  }, [user]);
+
   useEffect(() => {
     setDarkMode(storedDarkMode);
   }, [storedDarkMode]);
@@ -69,7 +83,6 @@ export default function AppContextProvider({ children }) {
   };
 
   useEffect(() => {
-    console.log(todoList);
     const pending = todoList.filter((item) => item.status === "pending");
     const paused = todoList.filter((item) => item.status === "paused");
     const completed = todoList.filter((item) => item.status === "completed");

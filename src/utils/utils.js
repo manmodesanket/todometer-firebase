@@ -1,25 +1,37 @@
-export function removeTodo({ id, dispatch }) {
+import { doc, updateDoc, deleteDoc } from "firebase/firestore";
+
+export async function removeTodo({ id, dispatch, username, db }) {
+  await deleteDoc(doc(db, username, id));
   dispatch({
     type: "REMOVE_ITEM",
     payload: id,
   });
 }
 
-export function addTodoLater({ todo, dispatch }) {
+export async function addTodoLater({ todo, dispatch, username, db }) {
+  await updateDoc(doc(db, username, todo.id), {
+    status: "paused",
+  });
   dispatch({
     type: "ADD_TO_DO_LATER",
     payload: todo,
   });
 }
 
-export function addToComplete({ todo, dispatch }) {
+export async function addToComplete({ todo, dispatch, username, db }) {
+  await updateDoc(doc(db, username, todo.id), {
+    status: "completed",
+  });
   dispatch({
     type: "ADD_TO_COMPLETED",
     payload: todo,
   });
 }
 
-export function addToPending({ todo, dispatch }) {
+export async function addToPending({ todo, dispatch, username, db }) {
+  await updateDoc(doc(db, username, todo.id), {
+    status: "pending",
+  });
   dispatch({
     type: "ADD_TO_PENDING",
     payload: todo,
