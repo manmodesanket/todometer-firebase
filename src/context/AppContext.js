@@ -33,8 +33,8 @@ export function useAppContext() {
 }
 
 export default function AppContextProvider({ children }) {
-  const [storedTodo, setStoredTodo] = useLocalStorage("todo", []);
-  const [todoList, todoDispatch] = useReducer(todoReducer, storedTodo);
+  // const [storedTodo, setStoredTodo] = useLocalStorage("todo", []);
+  const [todoList, todoDispatch] = useReducer(todoReducer, []);
   const [pending, setPending] = useState([]);
   const [paused, setPaused] = useState([]);
   const [completed, setCompleted] = useState([]);
@@ -47,10 +47,8 @@ export default function AppContextProvider({ children }) {
     const listener = auth.onAuthStateChanged((user) => {
       if (user != null) {
         setUser(user);
-        setLoadingAuth(false);
       } else {
         setUser(null);
-        setLoadingAuth(false);
       }
     });
     return () => listener();
@@ -60,9 +58,9 @@ export default function AppContextProvider({ children }) {
     setDarkMode(storedDarkMode);
   }, [storedDarkMode]);
 
-  useEffect(() => {
-    setStoredTodo(todoList);
-  }, [todoList]);
+  // useEffect(() => {
+  //   setStoredTodo(todoList);
+  // }, [todoList]);
 
   const toggleTheme = () => {
     setStoredDarkMode((currTheme) =>
@@ -71,6 +69,7 @@ export default function AppContextProvider({ children }) {
   };
 
   useEffect(() => {
+    console.log(todoList);
     const pending = todoList.filter((item) => item.status === "pending");
     const paused = todoList.filter((item) => item.status === "paused");
     const completed = todoList.filter((item) => item.status === "completed");
@@ -87,6 +86,7 @@ export default function AppContextProvider({ children }) {
         firebase,
         db,
         loadingAuth,
+        setLoadingAuth,
         auth,
         user,
         darkMode,

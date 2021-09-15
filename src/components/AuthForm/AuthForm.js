@@ -4,7 +4,9 @@ import {
   getAuth,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  updateProfile,
 } from "@firebase/auth";
+import { useAppContext } from "../../context/AppContext";
 
 export default function AuthForm() {
   const [formType, setFormType] = useState("login");
@@ -23,12 +25,17 @@ export default function AuthForm() {
 function Login({ setFormType }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const { user, setLoadingAuth } = useAppContext();
   const [error, setError] = useState(null);
   let inputRef = useRef(null);
 
   useEffect(() => {
     inputRef.current.focus();
   }, []);
+
+  useEffect(() => {
+    if (user !== null) setLoadingAuth(false);
+  }, [user]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -40,6 +47,7 @@ function Login({ setFormType }) {
         .then(() => {
           setUsername("");
           setPassword("");
+          setLoadingAuth(false);
         })
         .catch((error) => {
           setUsername("");
@@ -96,7 +104,9 @@ function Signup({ setFormType }) {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loadingSignup, setLoadingSignUp] = useState(true);
   const [error, setError] = useState(null);
+  const { setLoadingAuth } = useAppContext();
   let inputRef = useRef(null);
 
   useEffect(() => {
@@ -114,7 +124,9 @@ function Signup({ setFormType }) {
           setUsername("");
           setEmail("");
           setPassword("");
-          result.user.updateProfile({ displayName: username });
+          updateProfile(auth.currentUser, { displayName: username });
+          setLoadingSignUp(false);
+          setLoadingAuth(false);
         })
         .catch((error) => {
           setUsername("");
@@ -140,7 +152,7 @@ function Signup({ setFormType }) {
           type="text"
           ref={inputRef}
           onChange={(e) => setUsername(e.target.value)}
-          className="w-full border-2 my-2p-2 sm:p-4 rounded border-black dark:bg-inputColor"
+          className="w-full border-2 my-2 p-2 sm:p-4 rounded border-black dark:bg-inputColor"
           placeholder="Username"
         />
         <input

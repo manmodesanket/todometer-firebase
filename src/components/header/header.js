@@ -4,13 +4,20 @@ import { useEffect, useState } from "react";
 import { getAuth, signOut } from "@firebase/auth";
 
 export default function Navbar() {
-  const { darkMode, toggleTheme } = useAppContext();
+  const { darkMode, toggleTheme, setLoadingAuth } = useAppContext();
   let [dark, setDark] = useState("light");
   const auth = getAuth();
   const currentUser = auth.currentUser;
   useEffect(() => {
     setDark(darkMode);
   }, [darkMode]);
+
+  const handleSignout = () => {
+    signOut(auth).then(() => {
+      setLoadingAuth(true);
+    });
+  };
+
   return (
     <header className="w-full mx-auto">
       <nav className="flex justify-between items-center border-b-2">
@@ -21,7 +28,7 @@ export default function Navbar() {
           <h1 className="font-bold text-3xl sm:text-4xl ml-2">todometer</h1>
         </div>
         {currentUser && (
-          <LogOut onClick={() => signOut(auth)} className="cursor-pointer" />
+          <LogOut onClick={() => handleSignout()} className="cursor-pointer" />
         )}
         <div
           className="cursor-pointer flex items-center text-2xl sm:text-xl  dark:hover:text-dark-200"
