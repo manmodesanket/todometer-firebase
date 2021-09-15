@@ -6,7 +6,10 @@ import { addToComplete, addToPending, removeTodo } from "../../utils/utils";
 function DoLaterTodoCard({ todoItem }) {
   const { todoDispatch, db } = useAppContext();
   const auth = getAuth();
-  const { displayName } = auth.currentUser;
+  let displayName = "";
+  if (auth.currentUser !== null) {
+    displayName = auth.currentUser.displayName;
+  }
 
   async function handleAction(action) {
     if (action === "REMOVE") {

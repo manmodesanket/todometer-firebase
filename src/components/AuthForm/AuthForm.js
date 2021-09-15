@@ -33,10 +33,6 @@ function Login({ setFormType }) {
     inputRef.current.focus();
   }, []);
 
-  useEffect(() => {
-    if (user !== null) setLoadingAuth(false);
-  }, [user]);
-
   const handleSubmit = (e) => {
     e.preventDefault();
 

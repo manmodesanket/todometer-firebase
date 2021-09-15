@@ -6,7 +6,10 @@ import { removeTodo } from "../../utils/utils";
 function CompleteTodoCard({ todoItem }) {
   const { todoDispatch, db } = useAppContext();
   const auth = getAuth();
-  const { displayName } = auth.currentUser;
+  let displayName = "";
+  if (auth.currentUser !== null) {
+    displayName = auth.currentUser.displayName;
+  }
   return (
     <article className="w-full mx-auto px-4 py-2 mt-5 border-2 border-black rounded flex justify-between items-center dark:bg-itemColor">
       <div className="font-bold">{todoItem.task}</div>
