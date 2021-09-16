@@ -57,10 +57,14 @@ export default function AppContextProvider({ children }) {
   useEffect(async () => {
     let firebaseTodos = [];
     if (user !== null) {
-      const snap = await getDocs(collection(db, auth.currentUser.displayName));
-      snap.forEach((doc) => {
-        firebaseTodos.push(doc.data());
-      });
+      try {
+        const snap = await getDocs(
+          collection(db, auth.currentUser.displayName)
+        );
+        snap.forEach((doc) => {
+          firebaseTodos.push(doc.data());
+        });
+      } catch (err) {}
     }
     todoDispatch({
       type: "ADD_ALL_ITEMS",
