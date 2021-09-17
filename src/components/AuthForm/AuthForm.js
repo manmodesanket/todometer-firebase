@@ -32,7 +32,6 @@ function Login() {
     inputRef.current.focus();
   }, []);
 
-  console.log(formType);
   const handleSubmit = (e) => {
     e.preventDefault();
 
