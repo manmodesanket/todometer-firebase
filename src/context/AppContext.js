@@ -40,6 +40,7 @@ export default function AppContextProvider({ children }) {
   const [completed, setCompleted] = useState([]);
   const [user, setUser] = useState(null);
   const [loadingAuth, setLoadingAuth] = useState(true);
+  const [formType, setFormType] = useState("login");
   const [storedDarkMode, setStoredDarkMode] = useLocalStorage("dark", "light");
   const [darkMode, setDarkMode] = useState(storedDarkMode);
 
@@ -104,6 +105,8 @@ export default function AppContextProvider({ children }) {
         db,
         loadingAuth,
         setLoadingAuth,
+        formType,
+        setFormType,
         auth,
         user,
         darkMode,

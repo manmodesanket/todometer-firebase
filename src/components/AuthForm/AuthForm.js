@@ -1,4 +1,3 @@
-import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import {
   getAuth,
@@ -9,23 +8,23 @@ import {
 import { useAppContext } from "../../context/AppContext";
 
 export default function AuthForm() {
-  const [formType, setFormType] = useState("login");
+  const { formType, user, setLoadingAuth } = useAppContext();
 
-  return (
-    <>
-      {formType === "login" ? (
-        <Login setFormType={setFormType} />
-      ) : (
-        <Signup setFormType={setFormType} />
-      )}
-    </>
-  );
+  useEffect(() => {
+    if (user != null) {
+      setLoadingAuth(false);
+    } else {
+      setLoadingAuth(true);
+    }
+  }, [user]);
+
+  return <>{formType === "login" ? <Login /> : <Signup />}</>;
 }
 
-function Login({ setFormType }) {
+function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const { user, setLoadingAuth } = useAppContext();
+  const { user, setLoadingAuth, formType, setFormType } = useAppContext();
   const [error, setError] = useState(null);
   let inputRef = useRef(null);
 
@@ -33,6 +32,7 @@ function Login({ setFormType }) {
     inputRef.current.focus();
   }, []);
 
+  console.log(formType);
   const handleSubmit = (e) => {
     e.preventDefault();
 
@@ -41,8 +41,6 @@ function Login({ setFormType }) {
       const auth = getAuth();
       signInWithEmailAndPassword(auth, username, password)
         .then(() => {
-          setUsername("");
-          setPassword("");
           setLoadingAuth(false);
         })
         .catch((error) => {
@@ -96,13 +94,13 @@ function Login({ setFormType }) {
   );
 }
 
-function Signup({ setFormType }) {
+function Signup() {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loadingSignup, setLoadingSignUp] = useState(true);
   const [error, setError] = useState(null);
-  const { setLoadingAuth } = useAppContext();
+  const { setLoadingAuth, formType, setFormType } = useAppContext();
   let inputRef = useRef(null);
 
   useEffect(() => {
@@ -117,9 +115,6 @@ function Signup({ setFormType }) {
       const auth = getAuth();
       createUserWithEmailAndPassword(auth, email, password)
         .then((result) => {
-          setUsername("");
-          setEmail("");
-          setPassword("");
           updateProfile(auth.currentUser, { displayName: username });
           setLoadingSignUp(false);
           setLoadingAuth(false);
