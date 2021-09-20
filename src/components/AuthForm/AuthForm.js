@@ -1,28 +1,30 @@
-import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import {
   getAuth,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  updateProfile,
 } from "@firebase/auth";
+import { useAppContext } from "../../context/AppContext";
 
 export default function AuthForm() {
-  const [formType, setFormType] = useState("login");
+  const { formType, user, setLoadingAuth } = useAppContext();
 
-  return (
-    <>
-      {formType === "login" ? (
-        <Login setFormType={setFormType} />
-      ) : (
-        <Signup setFormType={setFormType} />
-      )}
-    </>
-  );
+  useEffect(() => {
+    if (user != null) {
+      setLoadingAuth(false);
+    } else {
+      setLoadingAuth(true);
+    }
+  }, [user]);
+
+  return <>{formType === "login" ? <Login /> : <Signup />}</>;
 }
 
-function Login({ setFormType }) {
+function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const { user, setLoadingAuth, formType, setFormType } = useAppContext();
   const [error, setError] = useState(null);
   let inputRef = useRef(null);
 
@@ -38,8 +40,7 @@ function Login({ setFormType }) {
       const auth = getAuth();
       signInWithEmailAndPassword(auth, username, password)
         .then(() => {
-          setUsername("");
-          setPassword("");
+          setLoadingAuth(false);
         })
         .catch((error) => {
           setUsername("");
@@ -92,11 +93,13 @@ function Login({ setFormType }) {
   );
 }
 
-function Signup({ setFormType }) {
+function Signup() {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loadingSignup, setLoadingSignUp] = useState(true);
   const [error, setError] = useState(null);
+  const { setLoadingAuth, formType, setFormType } = useAppContext();
   let inputRef = useRef(null);
 
   useEffect(() => {
@@ -111,10 +114,9 @@ function Signup({ setFormType }) {
       const auth = getAuth();
       createUserWithEmailAndPassword(auth, email, password)
         .then((result) => {
-          setUsername("");
-          setEmail("");
-          setPassword("");
-          result.user.updateProfile({ displayName: username });
+          updateProfile(auth.currentUser, { displayName: username });
+          setLoadingSignUp(false);
+          setLoadingAuth(false);
         })
         .catch((error) => {
           setUsername("");
@@ -140,7 +142,7 @@ function Signup({ setFormType }) {
           type="text"
           ref={inputRef}
           onChange={(e) => setUsername(e.target.value)}
-          className="w-full border-2 my-2p-2 sm:p-4 rounded border-black dark:bg-inputColor"
+          className="w-full border-2 my-2 p-2 sm:p-4 rounded border-black dark:bg-inputColor"
           placeholder="Username"
         />
         <input

@@ -5,14 +5,11 @@ export function todoReducer(state, action) {
   let uncompleteTodos = [];
   switch (action.type) {
     case "ADD_ITEM":
-      let newTodo = {
-        id: uuidv4(),
-        task: action.payload,
-        time: Date.now(),
-        status: "pending",
-      };
-      const newState = [...state, newTodo];
+      const newState = [...state, action.payload];
       return newState;
+
+    case "ADD_ALL_ITEMS":
+      return action.payload;
 
     case "REMOVE_ITEM":
       newTodoList = state.filter((todo) => todo.id != action.payload);

@@ -8,7 +8,7 @@ import {
 import { initializeApp } from "@firebase/app";
 import { getFirestore } from "@firebase/firestore";
 import { getAuth } from "@firebase/auth";
-import "firebase/firestore";
+import { getDocs, collection } from "firebase/firestore";
 import "firebase/auth";
 import useLocalStorage from "../hooks/useLocalStorage";
 import { todoReducer } from "../reducer/TodoReducer";
@@ -33,13 +33,14 @@ export function useAppContext() {
 }
 
 export default function AppContextProvider({ children }) {
-  const [storedTodo, setStoredTodo] = useLocalStorage("todo", []);
-  const [todoList, todoDispatch] = useReducer(todoReducer, storedTodo);
+  // const [storedTodo, setStoredTodo] = useLocalStorage("todo", []);
+  const [todoList, todoDispatch] = useReducer(todoReducer, []);
   const [pending, setPending] = useState([]);
   const [paused, setPaused] = useState([]);
   const [completed, setCompleted] = useState([]);
   const [user, setUser] = useState(null);
   const [loadingAuth, setLoadingAuth] = useState(true);
+  const [formType, setFormType] = useState("login");
   const [storedDarkMode, setStoredDarkMode] = useLocalStorage("dark", "light");
   const [darkMode, setDarkMode] = useState(storedDarkMode);
 
@@ -47,22 +48,38 @@ export default function AppContextProvider({ children }) {
     const listener = auth.onAuthStateChanged((user) => {
       if (user != null) {
         setUser(user);
-        setLoadingAuth(false);
       } else {
         setUser(null);
-        setLoadingAuth(false);
       }
     });
     return () => listener();
   }, []);
 
+  useEffect(async () => {
+    let firebaseTodos = [];
+    if (user !== null) {
+      try {
+        const snap = await getDocs(
+          collection(db, auth.currentUser.displayName)
+        );
+        snap.forEach((doc) => {
+          firebaseTodos.push(doc.data());
+        });
+      } catch (err) {}
+    }
+    todoDispatch({
+      type: "ADD_ALL_ITEMS",
+      payload: firebaseTodos,
+    });
+  }, [user]);
+
   useEffect(() => {
     setDarkMode(storedDarkMode);
   }, [storedDarkMode]);
 
-  useEffect(() => {
-    setStoredTodo(todoList);
-  }, [todoList]);
+  // useEffect(() => {
+  //   setStoredTodo(todoList);
+  // }, [todoList]);
 
   const toggleTheme = () => {
     setStoredDarkMode((currTheme) =>
@@ -87,6 +104,9 @@ export default function AppContextProvider({ children }) {
         firebase,
         db,
         loadingAuth,
+        setLoadingAuth,
+        formType,
+        setFormType,
         auth,
         user,
         darkMode,

@@ -11,7 +11,7 @@ import {
 import { useAppContext } from "../context/AppContext";
 
 export default function Home() {
-  const { darkMode, user } = useAppContext();
+  const { darkMode, loadingAuth } = useAppContext();
   let [dark, setDark] = useState("light");
   useEffect(() => {
     setDark(darkMode);
@@ -26,7 +26,7 @@ export default function Home() {
 
         <main className="w-11/12 sm:w-9/12 min-h-screen mx-auto sm:px-80">
           <Navbar />
-          {user ? (
+          {!loadingAuth ? (
             <>
               <DateView />
               <Meter />
