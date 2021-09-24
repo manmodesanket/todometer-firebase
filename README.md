@@ -15,4 +15,4 @@
 - Dark Mode
 - Authentication
 
-This project is inspired by [this repo](!https://github.com/cassidoo/todometer).
+This project is inspired by [this repo](https://github.com/cassidoo/todometer).
