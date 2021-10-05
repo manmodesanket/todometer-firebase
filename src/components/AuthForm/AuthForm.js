@@ -79,6 +79,15 @@ function Login() {
         >
           <span className="font-bold">Login</span>
         </button>
+        <button
+          onClick={() => {
+            setUsername("guest123@gmail.com");
+            setPassword("guest123");
+          }}
+          className="w-full bg-green-300 dark:bg-green-500 p-2 my-4 border rounded"
+        >
+          <span className="font-bold">Guest Login</span>
+        </button>
         <p>
           Don't have account{" "}
           <span
